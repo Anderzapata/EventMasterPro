@@ -1,152 +1,193 @@
 
 package com.mycompany.eventmasterpro;
 
+import java.io.*;
 import java.util.*;
 
 public class EventMasterPro {
 
-     private static Scanner scanner = new Scanner(System.in);
-    private static List<Location> locations = new ArrayList<>();
-    private static List<Event> events = new ArrayList<>();
-    private static List<Artist> artists = new ArrayList<>();
-    private static List<Ticket> tickets = new ArrayList<>();
+    private static final Scanner scanner = new Scanner(System.in);
+    private static User currentUser;
+    private static Event currentEvent;
+    private static final List<User> users = new ArrayList<>();
 
     public static void main(String[] args) {
-        int option;
-        do {
-            showMainMenu();
-            option = readIntegerInput("Choose an option: ");
-            switch (option) {
-                case 1 -> manageLocations();
-                case 2 -> manageEvents();
-                case 3 -> manageArtists();
-                case 4 -> manageTickets();
-                case 5 -> System.out.println("Exiting EventMaster Pro. Goodbye!");
-                default -> System.out.println("Invalid option. Please try again.");
+        System.out.println("Welcome to EventMaster Pro!");
+
+        loadUsersFromFile("users.txt");
+        loadDefaultUsersIfNeeded();
+
+       
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.authenticate(password)) {
+                currentUser = user;
+                System.out.println(user.getRole() + " authenticated!");
+                break;
             }
-        } while (option != 5);
-    }
+        }
 
-    private static void showMainMenu() {
-        System.out.println("\n=== Welcome to EventMaster Pro (Medellin) ===");
-        System.out.println("1. Manage Locations");
-        System.out.println("2. Manage Events");
-        System.out.println("3. Manage Artists");
-        System.out.println("4. Manage Tickets");
-        System.out.println("5. Exit");
-    }
-
-    private static void manageLocations() {
-        System.out.println("\n=== Manage Locations ===");
-        String name = readStringInput("Enter location name: ");
-        int capacity = readIntegerInput("Enter capacity: ");
-        String technicalDetails = readStringInput("Enter technical details: ");
-        boolean isAvailable = true; // Default available when created
-        locations.add(new Location(name, capacity, technicalDetails, isAvailable));
-        System.out.println("Location added successfully.");
-    }
-
-    private static void manageEvents() {
-        System.out.println("\n=== Manage Events ===");
-        if (locations.isEmpty()) {
-            System.out.println("No locations available. Please add a location first.");
+        if (currentUser == null) {
+            System.out.println("Authentication failed!");
             return;
         }
 
-        String name = readStringInput("Enter event name: ");
-        String date = readStringInput("Enter event date (YYYY-MM-DD): ");
-        String time = readStringInput("Enter event time (HH:MM): ");
+        currentEvent = Event.loadFromFile("event.txt");
 
-        System.out.println("Available locations:");
-        for (int i = 0; i < locations.size(); i++) {
-            System.out.println((i + 1) + ". " + locations.get(i).getName());
-        }
-        int locationIndex = readIntegerInput("Select a location by number: ") - 1;
-        if (locationIndex < 0 || locationIndex >= locations.size()) {
-            System.out.println("Invalid location selected.");
-            return;
-        }
-        Location selectedLocation = locations.get(locationIndex);
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("\nMenu:");
+            System.out.println("1. Create Event");
+            System.out.println("2. Add Tickets");
+            System.out.println("3. Sell Tickets");
+            System.out.println("4. View Event Details");
+            System.out.println("5. Exit");
 
-        System.out.println("Event Types: ");
-        for (EventType type : EventType.values()) {
-            System.out.println("- " + type);
-        }
-        String eventTypeInput = readStringInput("Enter event type (CONCERT, THEATER, CONFERENCE): ").toUpperCase();
-        EventType eventType;
-        try {
-            eventType = EventType.valueOf(eventTypeInput);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Invalid event type.");
-            return;
-        }
+            int option = scanner.nextInt();
+            scanner.nextLine(); 
 
-        events.add(new Event(name, date, time, selectedLocation, eventType));
-        System.out.println("Event created successfully.");
+            switch (option) {
+                case 1:
+                    createEvent();
+                    break;
+                case 2:
+                    addTickets();
+                    break;
+                case 3:
+                    sellTickets();
+                    break;
+                case 4:
+                    viewEventDetails();
+                    break;
+                case 5:
+                    exit = true;
+                    if (currentEvent != null) {
+                        saveSummaryToFile("event_summary.txt");
+                    }
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
     }
 
-    private static void manageArtists() {
-        System.out.println("\n=== Manage Artists ===");
-        String name = readStringInput("Enter artist name: ");
-        String contactInfo = readStringInput("Enter contact information: ");
-        String technicalRequirements = readStringInput("Enter technical requirements: ");
-        artists.add(new Artist(name, contactInfo, technicalRequirements));
-        System.out.println("Artist added successfully.");
+    private static void loadDefaultUsersIfNeeded() {
+        if (users.isEmpty()) {
+            User admin = new User("admin", "admin123", "admin");
+            User paula = new User("Paula", "Admin123", "admin");
+            users.add(admin);
+            users.add(paula);
+            admin.saveToFile("users.txt");
+            paula.saveToFile("users.txt");
+        }
     }
 
-    private static void manageTickets() {
-        System.out.println("\n=== Manage Tickets ===");
-        if (events.isEmpty()) {
-            System.out.println("No events available. Please create an event first.");
-            return;
+    private static void loadUsersFromFile(String filename) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                User user = User.fromDataString(line);
+                if (user != null) {
+                    users.add(user);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("No user file found. It will be created.");
         }
-
-        System.out.println("Available events:");
-        for (int i = 0; i < events.size(); i++) {
-            System.out.println((i + 1) + ". " + events.get(i).getName() + " (" + events.get(i).getEventType() + ")");
-        }
-        int eventIndex = readIntegerInput("Select an event by number: ") - 1;
-
-        if (eventIndex < 0 || eventIndex >= events.size()) {
-            System.out.println("Invalid event selected.");
-            return;
-        }
-
-        Event selectedEvent = events.get(eventIndex);
-
-        double price = readDoubleInput("Enter ticket price: ");
-        int quantity = readIntegerInput("Enter number of tickets to create: ");
-
-        for (int i = 0; i < quantity; i++) {
-            Ticket ticket = new Ticket(selectedEvent, price);
-            tickets.add(ticket);
-        }
-
-        System.out.println(quantity + " tickets created for event '" + selectedEvent.getName() + "' successfully!");
     }
 
- 
-    private static int readIntegerInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextInt()) {
-            System.out.print("Please enter a valid number: ");
-            scanner.next();
-        }
-        return scanner.nextInt();
-    }
+    private static void createEvent() {
+        System.out.print("Enter event name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter event date: ");
+        String date = scanner.nextLine();
+        System.out.print("Enter event time: ");
+        String time = scanner.nextLine();
+        System.out.print("Enter event location: ");
+        String location = scanner.nextLine();
 
-    private static double readDoubleInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextDouble()) {
-            System.out.print("Please enter a valid decimal number: ");
-            scanner.next();
-        }
-        return scanner.nextDouble();
-    }
-
-    private static String readStringInput(String prompt) {
-        System.out.print(prompt);
+        System.out.println("Select event type: (1) Concert (2) Theater (3) Conference");
+        String type = "";
+        int eventType = scanner.nextInt();
         scanner.nextLine(); 
-        return scanner.nextLine();
+        if (eventType == 1) type = "Concert";
+        else if (eventType == 2) type = "Theater";
+        else if (eventType == 3) type = "Conference";
+        else {
+            System.out.println("Invalid type. Defaulting to Concert.");
+            type = "Concert";
+        }
+
+        currentEvent = new Event(name, date, time, location, type);
+        currentEvent.saveToFile("event.txt");
+        System.out.println("Event created and saved successfully!");
+    }
+
+    private static void addTickets() {
+        if (currentEvent == null) {
+            System.out.println("No event created yet!");
+            return;
+        }
+
+        System.out.print("Enter ticket type (VIP, General, Palcos, Preferencial): ");
+        String ticketType = scanner.nextLine();
+
+        System.out.print("Enter ticket quantity: ");
+        int quantity = scanner.nextInt();
+
+        System.out.print("Enter ticket price: ");
+        double price = scanner.nextDouble();
+        scanner.nextLine();
+
+        currentEvent.addTicket(ticketType, quantity, price);
+        currentEvent.saveToFile("event.txt");
+
+        System.out.println("Ticket added and saved!");
+    }
+
+    private static void sellTickets() {
+        if (currentEvent == null) {
+            System.out.println("No event created yet!");
+            return;
+        }
+
+        System.out.print("Enter ticket type to sell: ");
+        String ticketType = scanner.nextLine();
+
+        System.out.print("Enter quantity to sell: ");
+        int quantity = scanner.nextInt();
+        scanner.nextLine();
+
+        if (currentEvent.sellTickets(ticketType, quantity)) {
+            currentEvent.saveToFile("event.txt");
+            System.out.println("Tickets sold and updated successfully!");
+        } else {
+            System.out.println("Cannot sell more tickets than available!");
+        }
+    }
+
+    private static void viewEventDetails() {
+        if (currentEvent == null) {
+            System.out.println("No event created yet!");
+            return;
+        }
+
+        System.out.println("Event details:\n" + currentEvent);
+    }
+
+    private static void saveSummaryToFile(String filename) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            String summary = "EVENT SUMMARY:\n" + currentEvent.toString();
+            writer.write(summary);
+            System.out.println("\n" + summary); 
+            System.out.println("Summary saved to " + filename);
+        } catch (IOException e) {
+            System.out.println("Error writing summary to file.");
+        }
     }
 }

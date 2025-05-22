@@ -2,48 +2,55 @@
 package com.mycompany.eventmasterpro;
 
 public class Ticket {
-    private Event event;
+    private String type;
+    private int quantity;
     private double price;
-    private TicketType ticketType;
-    private boolean isSold;
 
-    public Ticket(Event event, double price) {
-        this.event = event;
+    public Ticket(String type, int quantity, double price) {
+        this.type = type;
+        this.quantity = quantity;
         this.price = price;
-        this.ticketType = ticketType;
-        this.isSold = false;
     }
 
-  public TicketType getTicketType() {
-        return ticketType;
-    }
-    public Event getEvent() { 
-        return event; 
-    }
-    public void setEvent(Event event) { 
-        this.event = event; 
+    public String getType() {
+        return type;
     }
 
-    public double getPrice() { 
-        return price; 
-    }
-    public void setPrice(double price) { 
-        this.price = price; 
+    public int getQuantity() {
+        return quantity;
     }
 
-    public boolean isSold() { 
-        return isSold; 
+    public double getPrice() {
+        return price;
     }
-    public void setSold(boolean sold) { 
-        isSold = sold; 
+
+    public void sell(int amount) {
+        if (quantity >= amount) {
+            quantity -= amount;
+        }
+    }
+
+    public boolean canSell(int amount) {
+        return quantity >= amount;
+    }
+
+    public String toDataString() {
+        return type + ";" + quantity + ";" + price;
+    }
+
+    public static Ticket fromDataString(String data) {
+        String[] parts = data.split(";");
+        if (parts.length == 3) {
+            String type = parts[0];
+            int quantity = Integer.parseInt(parts[1]);
+            double price = Double.parseDouble(parts[2]);
+            return new Ticket(type, quantity, price);
+        }
+        return null;
     }
 
     @Override
     public String toString() {
-        return "Ticket for event: " + event.getName() + ", Price: " + price + ", Sold: " + isSold;
-    }
-
-    String getType() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return type + " - Quantity: " + quantity + ", Price: $" + price;
     }
 }

@@ -1,0 +1,4 @@
+maluma;2025-05-14;19:00;Macarena;Concert
+TICKET:Preferencial;0;980000.0
+TICKET:General;0;800000.0
+TICKET:VIP;500;1000000.0

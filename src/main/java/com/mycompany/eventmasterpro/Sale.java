@@ -2,23 +2,28 @@
 package com.mycompany.eventmasterpro;
 
 public class Sale {
-    private Ticket ticket;
-    private int quantity;
+    private String ticketType;
+    private int quantitySold;
 
-    public Sale(Ticket ticket, int quantity) {
-        this.ticket = ticket;
-        this.quantity = quantity;
+    public Sale(String ticketType, int quantitySold) {
+        this.ticketType = ticketType;
+        this.quantitySold = quantitySold;
     }
 
-    public double totalSale() {
-        return ticket.getPrice() * quantity;
+    public String getTicketType() {
+        return ticketType;
     }
 
-    public Ticket getTicket() { return ticket; }
-    public int getQuantity() { return quantity; }
+    public int getQuantitySold() {
+        return quantitySold;
+    }
+
+    public void addQuantity(int amount) {
+        this.quantitySold += amount;
+    }
 
     @Override
     public String toString() {
-        return "Sold " + quantity + " tickets of " + ticket.getType() + " - Total: $" + totalSale();
+        return "Ticket Type: " + ticketType + ", Quantity Sold: " + quantitySold;
     }
 }
