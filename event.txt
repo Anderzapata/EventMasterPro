@@ -1,4 +1,4 @@
-maluma;2025-05-14;19:00;Macarena;Concert
-TICKET:Preferencial;0;980000.0
-TICKET:General;0;800000.0
-TICKET:VIP;500;1000000.0
+Cocnierto silvestre;31-08-2025;19:00;estadio;Concert
+TICKET:Palcos;0;2.0E7
+TICKET:General;0;900000.0
+TICKET:VIP;0;1200000.0
