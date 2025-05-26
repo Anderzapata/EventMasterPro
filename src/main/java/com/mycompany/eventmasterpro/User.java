@@ -24,7 +24,7 @@ public class User {
     }
 
     public boolean authenticate(String inputPassword) {
-        return password.equals(inputPassword);
+        return this.password.equals(inputPassword);
     }
 
     public String toDataString() {

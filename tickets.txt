@@ -1,4 +1,0 @@
-VIP;500;129000.0
-General;12000;90000.0
-Palcos;500;2.0E7
-Preferential;300;100000.0

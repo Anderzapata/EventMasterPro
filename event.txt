@@ -1,4 +1,1 @@
-Cocnierto silvestre;31-08-2025;19:00;estadio;Concert
-TICKET:Palcos;0;2.0E7
-TICKET:General;0;900000.0
-TICKET:VIP;0;1200000.0
+Juntos de Nuevo;2025-08-31;19:00;Estadio;Concert

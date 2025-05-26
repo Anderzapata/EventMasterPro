@@ -1,2 +1,2 @@
 admin;admin123;admin
-Paula;1234*;user
+Paula;Admin123;admin
