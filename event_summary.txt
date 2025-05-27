@@ -1,0 +1,11 @@
+EVENT SUMMARY:
+Name: juntos de nuevo
+Date: 2025-08-31
+Time: 20:00
+Location: Estadio
+Type: Concert
+Tickets:
+ - PALCO - Quantity: 1, Price: $1000000.0
+ - PREFERENCIAL - Quantity: 50, Price: $200000.0
+ - VIP - Quantity: 1, Price: $100000.0
+ - GENERAL - Quantity: 100, Price: $50000.0

@@ -1,0 +1,12 @@
+Event: Juntos medellin
+Date: 2025-09-03
+Location: Estadio
+
+Ticket Type     Price           Sold            Revenue        
+-------------------------------------------------------------
+PALCO           $300,00         0               $0,00          
+PREFERENCIAL    $400,00         0               $0,00          
+VIP             $100,00         0               $0,00          
+GENERAL         $200,00         0               $0,00          
+
+TOTAL REVENUE: $0,00

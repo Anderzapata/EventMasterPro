@@ -4,12 +4,14 @@ package com.mycompany.eventmasterpro;
 public class Ticket {
     private String type;
     private int quantity;
+    private int sold;
     private double price;
 
     public Ticket(String type, int quantity, double price) {
         this.type = type;
         this.quantity = quantity;
         this.price = price;
+        this.sold = 0;
     }
 
     public String getType() {
@@ -22,6 +24,10 @@ public class Ticket {
 
     public double getPrice() {
         return price;
+      }
+
+    public int getSold() {
+    return sold;
     }
 
     public void sell(int amount) {
@@ -49,8 +55,17 @@ public class Ticket {
         return null;
     }
 
-    @Override
+
+    public void increaseQuantity(int amount) {
+        quantity += amount;
+    }
+
+     public void setPrice(double newPrice) {
+        price = newPrice;
+    }
+         @Override
     public String toString() {
         return type + " - Quantity: " + quantity + ", Price: $" + price;
-    }
+  
+  }
 }

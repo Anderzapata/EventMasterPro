@@ -20,8 +20,36 @@ public class Event {
         this.type = type;
     }
 
-    public void addTicket(String type, int quantity, double price) {
-        tickets.put(type, new Ticket(type, quantity, price));
+ 
+    public String getName() { 
+        return name; 
+    }
+    public String getDate() { 
+        return date; 
+    }
+    public String getTime() { 
+        return time; 
+    }
+    public String getLocation() { 
+        return location;
+    }
+    public String getType() { 
+        return type; 
+    }
+    public Map<String, Ticket> getTickets() { 
+        return tickets; 
+    }
+
+   
+    public void addTickets(String type, int quantity, double price) {
+        if (tickets.containsKey(type)) {
+            Ticket existing = tickets.get(type);
+            existing.increaseQuantity(quantity);
+            existing.setPrice(price);
+        } else {
+            Ticket newTicket = new Ticket(type, quantity, price);
+            tickets.put(type, newTicket);
+        }
     }
 
     public boolean sellTickets(String type, int amount) {
@@ -94,3 +122,5 @@ public class Event {
         return sb.toString();
     }
 }
+
+    

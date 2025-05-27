@@ -1,6 +1,7 @@
 
 package com.mycompany.eventmasterpro;
 
+import java.util.Map;
 import java.util.Scanner;
 
 public class FinancialManager {
@@ -49,7 +50,46 @@ public class FinancialManager {
         }
     }
 
-  
+  public void showFinancialReport(Event event) {
+        if (event == null) {
+            System.out.println("No event available.");
+            return;
+        }
+
+        String report = generateFinancialReport(event);
+        System.out.println("\n===== FINANCIAL REPORT =====");
+        System.out.println(report);
+    }
+
+    public String generateFinancialReport(Event event) {
+        if (event == null) {
+            return "No event data.";
+        }
+
+        StringBuilder report = new StringBuilder();
+        double totalRevenue = 0;
+
+        report.append("Event: ").append(event.getName()).append("\n");
+        report.append("Date: ").append(event.getDate()).append("\n");
+        report.append("Location: ").append(event.getLocation()).append("\n\n");
+
+        report.append(String.format("%-15s %-15s %-15s %-15s\n", "Ticket Type", "Price", "Sold", "Revenue"));
+        report.append("-------------------------------------------------------------\n");
+
+        for (Map.Entry<String, Ticket> entry : event.getTickets().entrySet()) {
+            Ticket ticket = entry.getValue();
+            int sold = ticket.getSold();
+            double revenue = sold * ticket.getPrice();
+            totalRevenue += revenue;
+
+            report.append(String.format("%-15s $%-14.2f %-15d $%-14.2f\n",
+                    ticket.getType(), ticket.getPrice(), sold, revenue));
+        }
+
+        report.append("\nTOTAL REVENUE: $").append(String.format("%.2f", totalRevenue));
+        return report.toString();
+    }
+
     public void addIncome(double amount) {
         totalIncome += amount;
     }

@@ -17,7 +17,7 @@ public class EventMasterPro {
     public static void main(String[] args) {
         System.out.println("Welcome to EventMaster Pro!");
 
-        loadUsersFromFile("users.txt");
+        loadUsersFromFile("user.txt");
         loadDefaultUsersIfNeeded();
 
         System.out.print("Enter username: ");
@@ -51,8 +51,8 @@ public class EventMasterPro {
             if (currentUser.getRole().equalsIgnoreCase("admin")) {
                 System.out.println("6. Financial Management");
                 System.out.println("7. Access and Attendance Management");
-                }
-             System.out.println("8. Exit");
+            }
+            System.out.println("8. Exit");
 
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -75,20 +75,19 @@ public class EventMasterPro {
                     break;
                 case 6:
                     if (currentUser.getRole().equalsIgnoreCase("admin")) {
-                        financialManager.manageFinances(scanner);
-                         } 
-                    else {
-                         System.out.println("Access denied: Only admins can manage finances.");
-                         }
-                     break;
+                        financialManager.showFinancialReport(currentEvent);
+                        saveFinancialReportToFile("financial_report.txt");
+                    } else {
+                        System.out.println("Access denied: Only admins can manage finances.");
+                    }
+                    break;
                 case 7:
                     if (currentUser.getRole().equalsIgnoreCase("admin")) {
                         accessManager.manageAccess(scanner, currentEvent);
-                         } 
-                    else {
+                    } else {
                         System.out.println("Access denied: Only admins can manage access and attendance.");
-                         }
-                    break;                    
+                    }
+                    break;
                 case 8:
                     exit = true;
                     if (currentEvent != null) {
@@ -105,11 +104,11 @@ public class EventMasterPro {
     private static void loadDefaultUsersIfNeeded() {
         if (users.isEmpty()) {
             User admin = new User("admin", "admin123", "admin");
-            User paula = new User("Paula", "Admin123", "user");
+            User paula = new User("Paula", "Admin123*", "user");
             users.add(admin);
             users.add(paula);
-            admin.saveToFile("users.txt");
-            paula.saveToFile("users.txt");
+            admin.saveToFile("user.txt");
+            paula.saveToFile("user.txt");
         }
     }
 
@@ -132,14 +131,14 @@ public class EventMasterPro {
         String type = "";
         int eventType = scanner.nextInt();
         scanner.nextLine();
-            if (eventType == 1) type = "Concert";
-                else if (eventType == 2) type = "Theater";
-                else if (eventType == 3) type = "Conference";
-                else {
+        if (eventType == 1) type = "Concert";
+        else if (eventType == 2) type = "Theater";
+        else if (eventType == 3) type = "Conference";
+        else {
             System.out.println("Invalid type. Defaulting to Concert.");
             type = "Concert";
-                   }
-        
+        }
+
         System.out.print("Enter event name: ");
         String name = scanner.nextLine();
         System.out.print("Enter event date (YYYY-MM-DD): ");
@@ -152,8 +151,8 @@ public class EventMasterPro {
         currentEvent = new Event(name, date, time, location, type);
         currentEvent.saveToFile("event.txt");
         System.out.println("Event created and saved successfully!");
-        }
-    
+    }
+
     private static void manageArtists() {
         boolean back = false;
         while (!back) {
@@ -175,7 +174,8 @@ public class EventMasterPro {
                     String nationality = scanner.nextLine();
                     Artist artist = new Artist(name, genre, nationality);
                     artists.add(artist);
-                    System.out.println("Artist added successfully!");
+                    artist.saveToFile("artist.txt");
+                    System.out.println("Artist added and saved successfully!");
                     break;
                 case 2:
                     if (artists.isEmpty()) {
@@ -193,7 +193,6 @@ public class EventMasterPro {
                 default:
                     System.out.println("Invalid option.");
             }
-            
         }
     }
 
@@ -206,14 +205,14 @@ public class EventMasterPro {
         String type = "";
         int TicketType = scanner.nextInt();
         scanner.nextLine();
-            if (TicketType == 1) type = "VIP";
-                else if (TicketType == 2) type = "GENERAL";
-                else if (TicketType == 3) type = "PALCO";
-                else if (TicketType == 4) type = "PREFERENCIAL";
-                else {
+        if (TicketType == 1) type = "VIP";
+        else if (TicketType == 2) type = "GENERAL";
+        else if (TicketType == 3) type = "PALCO";
+        else if (TicketType == 4) type = "PREFERENCIAL";
+        else {
             System.out.println("Invalid type. Defaulting to GENERAL.");
             type = "GENERAL";
-                   }
+        }
 
         System.out.print("Enter ticket quantity: ");
         int quantity = scanner.nextInt();
@@ -222,7 +221,8 @@ public class EventMasterPro {
         double price = scanner.nextDouble();
         scanner.nextLine();
 
-        currentEvent.saveToFile("ticketType.txt");
+        currentEvent.addTickets(type, quantity, price);
+        currentEvent.saveToFile("ticket.txt");
 
         System.out.println("Ticket added and saved!");
     }
@@ -267,5 +267,15 @@ public class EventMasterPro {
             System.out.println("Error writing summary to file.");
         }
     }
-} 
+
+    private static void saveFinancialReportToFile(String filename) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            String report = financialManager.generateFinancialReport(currentEvent);
+            writer.write(report);
+            System.out.println("Financial report saved to " + filename);
+        } catch (IOException e) {
+            System.out.println("Error writing financial report to file.");
+        }
+    }
+}
 
